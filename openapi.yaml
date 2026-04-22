@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: Order Service API
+  version: 1.0.0
+  description: Order management service for Choreo Deployment Tracks demo
+servers:
+  - url: /
+
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  version:
+                    type: string
+
+  /orders:
+    get:
+      summary: List all orders
+      operationId: listOrders
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  count:
+                    type: integer
+                  orders:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+
+    post:
+      summary: Create a new order
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  order:
+                    $ref: "#/components/schemas/Order"
+        "400":
+          description: Invalid request
+
+  /orders/{id}:
+    get:
+      summary: Get order by ID
+      operationId: getOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  order:
+                    $ref: "#/components/schemas/Order"
+        "404":
+          description: Order not found
+
+    delete:
+      summary: Delete an order
+      operationId: deleteOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Order deleted
+        "404":
+          description: Order not found
+
+components:
+  schemas:
+    OrderItem:
+      type: object
+      required: [name, quantity, unitPrice]
+      properties:
+        name:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          type: number
+          format: double
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        customer:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        status:
+          type: string
+          enum: [confirmed, payment_pending, paid, shipped, cancelled]
+        total:
+          type: number
+          format: double
+        createdAt:
+          type: string
+
+    CreateOrderRequest:
+      type: object
+      required: [customer, items]
+      properties:
+        customer:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
