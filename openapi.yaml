@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
   title: Order Service API
-  version: 1.0.0
-  description: Order management service for Choreo Deployment Tracks demo
+  version: 1.1.0
+  description: Order management service with payment integration - Choreo Deployment Tracks demo
 servers:
   - url: /
 
@@ -109,6 +109,68 @@ paths:
         "404":
           description: Order not found
 
+  /orders/{id}/pay:
+    post:
+      summary: Process payment for an order
+      operationId: payOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+      responses:
+        "200":
+          description: Payment processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  payment:
+                    $ref: "#/components/schemas/PaymentRecord"
+                  order:
+                    $ref: "#/components/schemas/Order"
+        "404":
+          description: Order not found
+        "409":
+          description: Order already paid
+
+  /orders/{id}/payment:
+    get:
+      summary: Get payment details for an order
+      operationId: getPayment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  payments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PaymentRecord"
+        "404":
+          description: No payment found
+
 components:
   schemas:
     OrderItem:
@@ -154,3 +216,33 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OrderItem"
+
+    PaymentRequest:
+      type: object
+      required: [method]
+      properties:
+        method:
+          type: string
+          enum: [credit_card, debit_card, bank_transfer]
+        cardLast4:
+          type: string
+
+    PaymentRecord:
+      type: object
+      properties:
+        paymentId:
+          type: string
+        orderId:
+          type: string
+        amount:
+          type: number
+          format: double
+        method:
+          type: string
+        cardLast4:
+          type: string
+        status:
+          type: string
+          enum: [completed, failed, refunded]
+        paidAt:
+          type: string
