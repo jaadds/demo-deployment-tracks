@@ -7,23 +7,6 @@ servers:
   - url: /
 
 paths:
-  /healthz:
-    get:
-      summary: Health check
-      operationId: healthCheck
-      responses:
-        "200":
-          description: Service health status
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                  version:
-                    type: string
-
   /orders:
     get:
       summary: List all orders
