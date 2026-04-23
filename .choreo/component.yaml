@@ -1,7 +1,7 @@
 schemaVersion: 1.2
 
 endpoints:
-  - name: Order Service
+  - name: order_service
     displayName: Order Service
     service:
       basePath: /
