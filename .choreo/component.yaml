@@ -9,5 +9,13 @@ endpoints:
     type: REST
     networkVisibilities:
       - Public
+    schemaFilePath: openapi.yaml
+  - name: order_service_org
+    displayName: Order Service
+    service:
+      basePath: /
+      port: 8080
+    type: REST
+    networkVisibilities:
       - Organization
     schemaFilePath: openapi.yaml
